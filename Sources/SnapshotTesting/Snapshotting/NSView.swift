@@ -22,6 +22,8 @@ extension Snapshotting where Value == NSView, Format == NSImage {
       return view.snapshot ?? Async { callback in
         addImagesForRenderedViews(view).sequence().run { views in
           let bitmapRep = view.bitmapImageRepForCachingDisplay(in: view.bounds)!
+          // use a device independet color space when snapshotting
+          bitmapRep.setProperty(.colorSyncProfileData, withValue: NSColorSpace.deviceRGB.colorSyncProfile)
           view.cacheDisplay(in: view.bounds, to: bitmapRep)
           let image = NSImage(size: view.bounds.size)
           image.addRepresentation(bitmapRep)
